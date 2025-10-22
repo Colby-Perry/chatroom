@@ -2,7 +2,6 @@ import socket
 import threading
 import tkinter as tk
 from tkinter import scrolledtext
-from datetime import datetime
 import argparse
 
 def get_local_ip():

@@ -93,8 +93,6 @@ class ChatServer:
         with open(self.history_file, "a") as f:
             f.write(message.rstrip() + "\n")
 
-
-
     def shutdown(self):
         print("Shutting down server.")
         for conn, _ in self.clients:
