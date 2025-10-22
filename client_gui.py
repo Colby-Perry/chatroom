@@ -2,6 +2,19 @@ import socket
 import threading
 import tkinter as tk
 from tkinter import scrolledtext
+from datetime import datetime
+import argparse
+
+def get_local_ip():
+    """Automatically detect the local IP address."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+        return local_ip
+    except Exception:
+        return "127.0.0.1"
 
 class ChatClient:
     def __init__(self, host='127.0.0.1', port=5000, nickname='User'):
@@ -46,7 +59,7 @@ class ChatClient:
 
     def display_message(self, message):
         self.text_area.config(state='normal')
-        self.text_area.insert(tk.END, message + '\n')
+        self.text_area.insert(tk.END, message)
         self.text_area.config(state='disabled')
         self.text_area.yview(tk.END)
 
@@ -71,10 +84,17 @@ class ChatClient:
         self.root.quit()
 
 if __name__ == "__main__":
-    # you can take nickname input etc.
-    nickname = input("Enter your nickname: ")
-    host = input("Enter server host [127.0.0.1]: ") or '127.0.0.1'
-    port_str = input("Enter server port [5000]: ") or '5000'
-    port = int(port_str)
+    parser = argparse.ArgumentParser(description="Simple Chat Client")
+    parser.add_argument("host", nargs="?", default=None, help="Server host (optional)")
+    parser.add_argument("port", nargs="?", type=int, default=5000, help="Server port (default: 5000)")
+    parser.add_argument("--nick", default=None, help="Nickname (optional)")
+    args = parser.parse_args()
+
+    # If host not specified, detect automatically
+    host = args.host or get_local_ip()
+    port = args.port
+    nickname = args.nick or input("Enter your nickname: ")
+
+    print(f"Connecting to {host}:{port} as {nickname}...")
     client = ChatClient(host=host, port=port, nickname=nickname)
     client.start()
